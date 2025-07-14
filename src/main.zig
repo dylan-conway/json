@@ -1,5 +1,6 @@
 const std = @import("std");
 const foo = @import("foo");
+const json = @import("./json.zig");
 
 pub fn main() !void {
     var gpa: std.heap.GeneralPurposeAllocator(.{}) = .{};
@@ -7,10 +8,31 @@ pub fn main() !void {
 
     const allocator = gpa.allocator();
 
-    const root_pkg_json_contents = std.fs.cwd().readFileAlloc(allocator, "package.json") catch |err| {
+    const root_pkg_json_contents = std.fs.cwd().readFileAlloc(allocator, "package.json", std.math.maxInt(u64)) catch |err| {
         std.log.err("failed to read package.json: {s}", .{@errorName(err)});
         std.process.exit(1);
     };
+    defer allocator.free(root_pkg_json_contents);
+
+    var json_parser: json.Parser(u8) = .init(allocator, root_pkg_json_contents);
+    defer json_parser.deinit();
+
+    const root_pkg_json = try json_parser.parse().unwrap();
+    defer root_pkg_json.deinit();
+
+    const _num: f64 = 0;
+
+    std.debug.print("{}, {}, {}, {}\n", .{
+        std.math.isPositiveZero(_num),
+        std.math.isNegativeZero(_num),
+        std.math.isPositiveZero(-_num),
+        std.math.isNegativeZero(-_num),
+    });
+
+    var test_arr: std.ArrayList(u8) = .init(allocator);
+    defer test_arr.deinit();
+
+    try test_arr.ensureTotalCapacityPrecise(1);
 }
 
 test "simple test" {

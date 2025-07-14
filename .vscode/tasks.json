@@ -1,0 +1,18 @@
+{
+    "tasks": [
+        {
+            "label": "Build Debug",
+            "type": "shell",
+            "command": "zig",
+            "args": [
+                "build",
+                "-Doptimize=Debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$zig"]
+        }
+    ]
+}
